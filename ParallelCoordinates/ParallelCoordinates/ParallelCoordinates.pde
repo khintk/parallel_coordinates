@@ -27,12 +27,21 @@ void loadData() {
   //carsTable =  loadTable("cars-cleaned.tsv", "header");
   dataset = loadTable(filePathData, "header");
   attributes = new Attribute[dataset.getColumnCount()];
-  printArray(attributes);
+  Item[] items = new Item[dataset.getRowCount()];
+  //printArray(attributes);
   //attributes[0] = new Attribute(dataset.getString(0,0));
+  
+  // initialize array of items
+  int count = 0;
+  for (TableRow row : dataset.rows()){
+    items[count] = new Item(row.getString(0));
+    count++;
+  }
   
   float startingXValue = 25.0;
   int offset = 900/ attributes.length;
   
+  //initialize attribute rectangles
   for(int i = 0; i<dataset.getColumnCount(); i++){
     attributes[i] = new Attribute(startingXValue, 975.0, 5.0, 5.0);
     startingXValue = startingXValue + offset;
@@ -41,7 +50,9 @@ void loadData() {
   
   
   
-  
+  for (Item i : items){
+    System.out.println(i.toString());
+  }
   
   
   //bubbles = new Bubble[table.getRowCount()];
