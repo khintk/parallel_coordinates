@@ -36,7 +36,6 @@ void loadData() {
   for(int i = 0; i<dataset.getColumnCount(); i++){
     attributes[i] = new Attribute(startingXValue, 975.0, 5.0, 5.0);
     startingXValue = startingXValue + offset;
-  
   }
   
   
