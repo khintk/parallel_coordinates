@@ -17,6 +17,10 @@ class Item{
     dataPoints.put(attribute, value);
   }
   
+  float getValue(String k){
+    return dataPoints.get(k);
+  }
+  
   String toString(){
     return name;
   }

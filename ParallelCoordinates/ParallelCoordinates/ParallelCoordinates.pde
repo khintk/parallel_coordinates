@@ -9,6 +9,7 @@ String filePathData = "cameras-cleaned.tsv";
 int widthOfScreen = 1300;
 int heigthOfScreen = 750;
 Attribute[] attributes; 
+Item[] items;
 
 void setup() {
   size(1300, 750);
@@ -21,24 +22,26 @@ void draw() {
    for(int i = 0; i<attributes.length; i++){
      attributes[i].display();
   }
+  drawLines();
 }
 
 void loadData() {
   dataset = loadTable(filePathData);
+  datasetWithHeader = loadTable(filePathData,"header");
   attributes = new Attribute[dataset.getColumnCount()];
-  Item[] items = new Item[dataset.getRowCount()];
+  items = new Item[datasetWithHeader.getRowCount()];
   //printArray(attributes);
   //attributes[0] = new Attribute(dataset.getString(0,0));
   // initialize array of items
   int count = 0;
-  for (TableRow row : dataset.rows()){
+  for (TableRow row : datasetWithHeader.rows()){
     items[count] = new Item(row.getString(0));
     count++;
   }
   
   float startingXValue = 50.0;
   int offset = widthOfScreen/ attributes.length;
-  datasetWithHeader = loadTable(filePathData,"header");
+  
   
   String[] nameOfColumns = new String[dataset.getColumnCount()];
   //String sample = dataset.getString(0,1);
@@ -57,7 +60,7 @@ void loadData() {
    //adding max and min for each attribute 
    for(int i = 0; i < nameOfColumns.length; i++){
     if(i == 0){
-      attributes[i].max = 0.0;
+      attributes[i].max = items.length; // max is the number of items we have
     }
     else{
       attributes[i].max = findMax(datasetWithHeader.getStringColumn(nameOfColumns[i]));
@@ -67,9 +70,9 @@ void loadData() {
   
   
   //Each item contains a value for each column 
-  for (int i = 1; i< items.length; i++){ // each row
+  for (int i = 0; i< items.length; i++){ // each row
     for (int j = 1; j < attributes.length; j++){ // each column
-      items[i].addEntry(attributes[j].label, dataset.getFloat(i, j));
+      items[i].addEntry(attributes[j].label, datasetWithHeader.getFloat(i, j));
     }
   }
 
@@ -104,4 +107,32 @@ float findMin(String[] valuesInColumns) {
     }
   }
   return minValue;
+}
+
+// right now this goes in the original order of the attribute columns
+
+void drawLines(){
+  strokeWeight(4);
+  stroke(200);
+  for (int i = 1; i < items.length; i++){
+    float prevY = 0;
+    for (int j = 0; j < attributes.length; j++){
+      Attribute currentAttribute = attributes[j];
+      float scaledPoint; 
+      if (j == 0){ // the first attribute - items in the order they appear in the dataset
+        scaledPoint = scalePoint(currentAttribute.max, currentAttribute.min, i);
+        point(currentAttribute.x, scaledPoint);
+        prevY = scaledPoint;
+      }
+      else{ // names have been taken care of, so draw lines to previous 
+        scaledPoint = scalePoint(currentAttribute.max, currentAttribute.min, items[i].getValue(currentAttribute.label));
+        point(currentAttribute.x, scaledPoint);
+        //ellipse(currentAttribute.x, scaledPoint, 10, 10);
+        stroke(j*15, j*5, j*10);
+        line(attributes[j-1].x, prevY, currentAttribute.x, scaledPoint);
+        //line(attributes[j].x, attributes[j].y, 500, 500);
+        prevY = scaledPoint;
+      }
+    }
+  }
 }
