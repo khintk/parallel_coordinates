@@ -1,6 +1,8 @@
 Table cameraTable;
 Table carsTable;
 Table dataset; 
+Table datasetWithHeader;
+
 String filePathData = "cameras-cleaned.tsv";
 //String filePathData = "cars-cleaned.tsv";
 
@@ -16,19 +18,12 @@ void setup() {
 
 void draw() {
   background(255);
-  //Attribute sample = new Attribute(400, 400, 50, 50);
-  
    for(int i = 0; i<attributes.length; i++){
      attributes[i].display();
-     //println(attributes[i]);
   }
-  //sample.display();
-  
 }
 
 void loadData() {
-  //cameraTable = loadTable("cameras-cleaned.tsv", "header");
-  //carsTable =  loadTable("cars-cleaned.tsv", "header");
   dataset = loadTable(filePathData);
   attributes = new Attribute[dataset.getColumnCount()];
   Item[] items = new Item[dataset.getRowCount()];
@@ -41,59 +36,51 @@ void loadData() {
     count++;
   }
   
-  
   float startingXValue = 50.0;
   int offset = widthOfScreen/ attributes.length;
+  datasetWithHeader = loadTable(filePathData,"header");
   
+  String[] nameOfColumns = new String[dataset.getColumnCount()];
+  //String sample = dataset.getString(0,1);
+  for (int i = 0; i < dataset.getColumnCount(); i ++){
+    String name = dataset.getString(0,i);
+    nameOfColumns[i] = name;
+  }
+  printArray(nameOfColumns);
+
   //initialize attribute rectangles
-  for(int i = 0; i<dataset.getColumnCount(); i++){
-    
+  for(int i = 0; i<datasetWithHeader.getColumnCount(); i++){
     attributes[i] = new Attribute(startingXValue, 75.0, 5.0, 600.0, dataset.getString(0,i));
-    attributes[i].max = findMax(dataset.getStringColumn(i));
-    attributes[i].min = findMin(dataset.getStringColumn(i));
     startingXValue = startingXValue + offset;
-    //Attribute(float tempX1, float tempY1, float Width, float Height
+  }
+   
+   //adding max and min for each attribute 
+   for(int i = 0; i < nameOfColumns.length; i++){
+    if(i == 0){
+      attributes[i].max = 0.0;
+    }
+    else{
+      attributes[i].max = findMax(datasetWithHeader.getStringColumn(nameOfColumns[i]));
+      attributes[i].min = findMin(datasetWithHeader.getStringColumn(nameOfColumns[i]));
+    }
   }
   
   
-  for (int i = 1; i< items.length; i++){
-    for (int j = 1; j < attributes.length; j++){
+  //Each item contains a value for each column 
+  for (int i = 1; i< items.length; i++){ // each row
+    for (int j = 1; j < attributes.length; j++){ // each column
       items[i].addEntry(attributes[j].label, dataset.getFloat(i, j));
     }
-    //printArray(items[i].dataPoints.values().toArray());
   }
-  
-  
-  //bubbles = new Bubble[table.getRowCount()];
 
-
-  //for (int i = 0; i<table.getRowCount(); i++) {
-  //  // Iterate over all the rows in a table.
-  //  TableRow row = table.getRow(i);  
-  //  // Access the fields via their column name (or index).
-  //  float x = row.getFloat("x");
-  //  float y = row.getFloat("y");
-  //  float d = row.getFloat("diameter");
-  //  String n = row.getString("name");
-  //  // Make a Bubble object out of the data from each row.
-  //  bubbles[i] = new Bubble(x, y, d, n);
 }
-//String[] nameOfColumns(int n) {
-//  String[] nameOfColumns = new String[n];
-//  for (int i = 0; i < n; i++) {
-//    xstartingXValue = xstartingXValue + 2.0;
-//    String xstartingXValueString = str(xstartingXValue);
-//    arrayTextXPoints[i] = xstartingXValueString;
-//  }
-//  return arrayTextXPoints;
-//}
 
 float scalePoint(float max, float min, float point){
   float yStartPoint = 75;
   float yEndPoint = 675;
   float heighOfBar = 600;
   float interval = heighOfBar/ (max-min); 
-  float positionOnBar = ((max - point) * interval) + ystartingPoint;
+  float positionOnBar = ((max - point) * interval) + yStartPoint;
   return positionOnBar; // this represents the y coordinate on the screen
 }
 
