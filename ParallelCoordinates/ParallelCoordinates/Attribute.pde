@@ -17,10 +17,20 @@ class Attribute{
     label = labelString;
   }
   
-  void rollover(float px, float py) {
-    //Write what happens if the mouse moves over. 
+  
+  
+  boolean isSelected(float px){
+    if( px > (x - 15) && px < (x + 15)){
+      return true; 
+    }
+    return false; 
+    
   }
   
+   void isReleased(float px){
+     x = px;
+    
+  }
   
   
   void display(){

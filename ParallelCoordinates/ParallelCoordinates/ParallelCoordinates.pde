@@ -109,7 +109,20 @@ float findMin(String[] valuesInColumns) {
   }
   return minValue;
 }
+Attribute selectedAttribute; 
+void mousePressed(){
+  for (int i = 0; i < attributes.length; i++){
+    if(attributes[i].isSelected(mouseX)){
+      selectedAttribute = attributes[i];
+    } 
+  }
+}
 
+void mouseDragged(){}
+
+void mouseReleased(){
+  selectedAttribute.isReleased(mouseX);
+}
 // right now this goes in the original order of the attribute columns
 
 void drawLines(){
