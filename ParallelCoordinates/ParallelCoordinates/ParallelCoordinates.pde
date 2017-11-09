@@ -3,8 +3,8 @@ Table carsTable;
 Table dataset; 
 Table datasetWithHeader;
 
-String filePathData = "cameras-cleaned.tsv";
-//String filePathData = "cars-cleaned.tsv";
+//String filePathData = "cameras-cleaned.tsv";
+String filePathData = "cars-cleaned.tsv";
 
 int widthOfScreen = 1300;
 int heigthOfScreen = 750;
@@ -49,7 +49,7 @@ void loadData() {
     String name = dataset.getString(0,i);
     nameOfColumns[i] = name;
   }
-  printArray(nameOfColumns);
+  //printArray(nameOfColumns);
 
   //initialize attribute rectangles
   for(int i = 0; i<datasetWithHeader.getColumnCount(); i++){
@@ -61,6 +61,7 @@ void loadData() {
    for(int i = 0; i < nameOfColumns.length; i++){
     if(i == 0){
       attributes[i].max = items.length; // max is the number of items we have
+      attributes[i].min = 0;
     }
     else{
       attributes[i].max = findMax(datasetWithHeader.getStringColumn(nameOfColumns[i]));
@@ -80,9 +81,9 @@ void loadData() {
 
 float scalePoint(float max, float min, float point){
   float yStartPoint = 75;
-  float yEndPoint = 675;
-  float heighOfBar = 600;
-  float interval = heighOfBar/ (max-min); 
+  //float yEndPoint = 675;
+  float heightOfBar = 600;
+  float interval = heightOfBar/ (max-min);
   float positionOnBar = ((max - point) * interval) + yStartPoint;
   return positionOnBar; // this represents the y coordinate on the screen
 }
@@ -99,10 +100,10 @@ float findMax(String[] valuesInColumns) {
 }
 
 float findMin(String[] valuesInColumns) { 
-  float minValue = 0.0;
+  float minValue = Float.MAX_VALUE;
   for (int i = 0; i < valuesInColumns.length; i++) {
     float value = Float.valueOf(valuesInColumns[i]);
-    if (value > minValue){
+    if (value < minValue){
       minValue = value;
     }
   }
@@ -112,27 +113,24 @@ float findMin(String[] valuesInColumns) {
 // right now this goes in the original order of the attribute columns
 
 void drawLines(){
-  strokeWeight(4);
-  stroke(200);
+  strokeWeight(1);
+  stroke(0,0,200);
   for (int i = 1; i < items.length; i++){
-    float prevY = 0;
+    noFill();
+    beginShape();
     for (int j = 0; j < attributes.length; j++){
       Attribute currentAttribute = attributes[j];
-      float scaledPoint; 
+      stroke(i*.25, i*.2, i*.5);
+      float scaledY; 
       if (j == 0){ // the first attribute - items in the order they appear in the dataset
-        scaledPoint = scalePoint(currentAttribute.max, currentAttribute.min, i);
-        point(currentAttribute.x, scaledPoint);
-        prevY = scaledPoint;
+      //(need to check if current attribute type is string)
+        scaledY = scalePoint(currentAttribute.max, currentAttribute.min, i);
       }
       else{ // names have been taken care of, so draw lines to previous 
-        scaledPoint = scalePoint(currentAttribute.max, currentAttribute.min, items[i].getValue(currentAttribute.label));
-        point(currentAttribute.x, scaledPoint);
-        //ellipse(currentAttribute.x, scaledPoint, 10, 10);
-        stroke(j*15, j*5, j*10);
-        line(attributes[j-1].x, prevY, currentAttribute.x, scaledPoint);
-        //line(attributes[j].x, attributes[j].y, 500, 500);
-        prevY = scaledPoint;
+        scaledY = scalePoint(currentAttribute.max, currentAttribute.min, items[i].getValue(currentAttribute.label));
       }
+      vertex(currentAttribute.x, scaledY);
     }
+    endShape();
   }
 }
