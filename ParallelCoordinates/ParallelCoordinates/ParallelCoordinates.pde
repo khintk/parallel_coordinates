@@ -1,15 +1,16 @@
 Table cameraTable;
 Table carsTable;
 Table dataset; 
-Table datasetWithHeader;
 
 //String filePathData = "cameras-cleaned.tsv";
-String filePathData = "cars-cleaned.tsv";
+//String filePathData = "cars-cleaned.tsv";
+String filePathData = "nutrients-cleaned.tsv";
 
 int widthOfScreen = 1300;
 int heigthOfScreen = 750;
 Attribute[] attributes; 
 Item[] items;
+Attribute selectedAttribute;
 
 void setup() {
   size(1300, 750);
@@ -26,15 +27,13 @@ void draw() {
 }
 
 void loadData() {
-  dataset = loadTable(filePathData);
-  datasetWithHeader = loadTable(filePathData,"header");
+  dataset = loadTable(filePathData,"header");
   attributes = new Attribute[dataset.getColumnCount()];
-  items = new Item[datasetWithHeader.getRowCount()];
-  //printArray(attributes);
-  //attributes[0] = new Attribute(dataset.getString(0,0));
+  items = new Item[dataset.getRowCount()];
+  
   // initialize array of items
   int count = 0;
-  for (TableRow row : datasetWithHeader.rows()){
+  for (TableRow row : dataset.rows()){
     items[count] = new Item(row.getString(0));
     count++;
   }
@@ -42,38 +41,38 @@ void loadData() {
   float startingXValue = 50.0;
   int offset = widthOfScreen/ attributes.length;
   
-  
-  String[] nameOfColumns = new String[dataset.getColumnCount()];
-  //String sample = dataset.getString(0,1);
-  for (int i = 0; i < dataset.getColumnCount(); i ++){
-    String name = dataset.getString(0,i);
-    nameOfColumns[i] = name;
-  }
-  //printArray(nameOfColumns);
 
   //initialize attribute rectangles
-  for(int i = 0; i<datasetWithHeader.getColumnCount(); i++){
-    attributes[i] = new Attribute(startingXValue, 75.0, 5.0, 600.0, dataset.getString(0,i));
+  for(int i = 0; i<dataset.getColumnCount(); i++){
+    String title = dataset.getRow(0).getColumnTitle(i);
+    attributes[i] = new Attribute(startingXValue, 75.0, 5.0, 600.0, title);
     startingXValue = startingXValue + offset;
-  }
-   
-   //adding max and min for each attribute 
-   for(int i = 0; i < nameOfColumns.length; i++){
-    if(i == 0){
+    
+    String testStr = dataset.getString(0, i); 
+    try {
+     float testVal = Float.valueOf(testStr);
+    } 
+    catch (NumberFormatException e) {
+      attributes[i].isStringType = true;
+    }
+    //add max and min for each attribute 
+    if(attributes[i].isStringType){
       attributes[i].max = items.length; // max is the number of items we have
       attributes[i].min = 0;
     }
     else{
-      attributes[i].max = findMax(datasetWithHeader.getStringColumn(nameOfColumns[i]));
-      attributes[i].min = findMin(datasetWithHeader.getStringColumn(nameOfColumns[i]));
+      attributes[i].max = findMax(dataset.getStringColumn(title));
+      attributes[i].min = findMin(dataset.getStringColumn(title));
     }
-  }
-  
-  
-  //Each item contains a value for each column 
+    
+  }  
+  //Each item contains a value for each column
+  // fill hashmaps of these values
   for (int i = 0; i< items.length; i++){ // each row
-    for (int j = 1; j < attributes.length; j++){ // each column
-      items[i].addEntry(attributes[j].label, datasetWithHeader.getFloat(i, j));
+    for (int j = 0; j < attributes.length; j++){ // each column
+      if (!attributes[j].isStringType){
+        items[i].addEntry(attributes[j].label, dataset.getFloat(i, j));
+      }
     }
   }
 
@@ -109,34 +108,43 @@ float findMin(String[] valuesInColumns) {
   }
   return minValue;
 }
-Attribute selectedAttribute; 
+ 
 void mousePressed(){
   for (int i = 0; i < attributes.length; i++){
-    if(attributes[i].isSelected(mouseX)){
+    if(attributes[i].inBounds(mouseX, mouseY)){
       selectedAttribute = attributes[i];
     } 
   }
 }
 
-void mouseDragged(){}
+void mouseDragged(){
+  if (selectedAttribute != null){
+    selectedAttribute.x = mouseX;
+  }
+}
 
 void mouseReleased(){
-  selectedAttribute.isReleased(mouseX);
+  if (selectedAttribute != null){
+    selectedAttribute.x = mouseX;
+    selectedAttribute = null;
+  }
 }
 // right now this goes in the original order of the attribute columns
 
 void drawLines(){
-  strokeWeight(1);
+  strokeWeight(0.7);
   stroke(0,0,200);
   for (int i = 1; i < items.length; i++){
     noFill();
     beginShape();
     for (int j = 0; j < attributes.length; j++){
       Attribute currentAttribute = attributes[j];
-      stroke(i*.25, i*.2, i*.5);
+      //stroke(i*.25, i*.2, i*.5);
+      stroke(150, 40, 230);
       float scaledY; 
-      if (j == 0){ // the first attribute - items in the order they appear in the dataset
+      if (currentAttribute.isStringType){ // the first attribute - items in the order they appear in the dataset
       //(need to check if current attribute type is string)
+        // use arrayList to store attributes
         scaledY = scalePoint(currentAttribute.max, currentAttribute.min, i);
       }
       else{ // names have been taken care of, so draw lines to previous 

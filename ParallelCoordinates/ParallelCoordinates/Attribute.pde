@@ -3,10 +3,10 @@ class Attribute{
   float y;
   float widthOfRectangle;
   float heightOfRectangle;
-  boolean over = false;
   String label;
   float max;
   float min; 
+  boolean isStringType;
   
   
   Attribute(float tempX1, float tempY1, float Width, float Height, String labelString) {
@@ -15,21 +15,14 @@ class Attribute{
     widthOfRectangle = Width;
     heightOfRectangle = Height;
     label = labelString;
+    isStringType = false;
   }
   
-  
-  
-  boolean isSelected(float px){
-    if( px > (x - 15) && px < (x + 15)){
+  boolean inBounds(float px, float py){ // check if click is valid to select attribute
+    if( px > (x - 15) && px < (x +15) && (py > (y-45)) && py < (y-15)){
       return true; 
     }
-    return false; 
-    
-  }
-  
-   void isReleased(float px){
-     x = px;
-    
+    return false;   
   }
   
   
@@ -41,10 +34,6 @@ class Attribute{
     textAlign(LEFT,TOP);
     text(label,x-15,y-30);
     textSize(10);
-    
-    if (over) {
-       //Select the range of values, by drawing the rectangle bar over it. 
-    }
   }
   
 }
