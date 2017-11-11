@@ -9,19 +9,27 @@ String filePathData = "cars-cleaned.tsv";
 ArrayList<Attribute> attributes; 
 Item[] items;
 Attribute selectedAttribute;
+FilterBox selectedBox;
+
+int selectedIndex;
+boolean resizeBox;
+boolean moveBox;
 
 void setup() {
   size(1300, 750, P2D);
   pixelDensity(displayDensity());
   loadData();
+  
+  resizeBox = false;
+  moveBox = false;
 }
 
 void draw() {
   background(255);
+  drawLines();
    for(int i = 0; i<attributes.size(); i++){
      attributes.get(i).display();
   }
-  drawLines();
 }
 
 void loadData() {
@@ -34,6 +42,9 @@ void loadData() {
   for (TableRow row : dataset.rows()){
     items[count] = new Item(row.getString(0));
     count++;
+    //if (count % 4 == 0){
+    //  items[count-1].shouldShow = false;
+    //}
   }
   
   float startingXValue = 50.0;
@@ -108,19 +119,48 @@ float findMin(String[] valuesInColumns) {
   return minValue;
 }
 
-int selectedIndex;
+
 void mousePressed(){
   for (int i = 0; i < attributes.size(); i++){
-    if(attributes.get(i).inBounds(mouseX, mouseY)){
-      selectedAttribute = attributes.get(i);
+    Attribute c = attributes.get(i);
+    if(c.inLBounds(mouseX, mouseY)){
+      selectedAttribute = c;
       selectedIndex = i;
-    } 
+    } // CHECK IF IN ATTRIBUTE BOUNDS
+    else if(c.inBBounds(mouseX, mouseY)){
+      if (c.box == null){ // first box
+        FilterBox b = new FilterBox();
+        b.boxHeight = 20;
+        b.yPos = mouseY;
+        c.box = b;
+      }
+      selectedBox = c.box;
+      if (c.shouldResizeBox(mouseX, mouseY)){
+         resizeBox = true;
+      }
+      else if (c.shouldMoveBox(mouseX, mouseY)){
+         moveBox = true;
+      }
+      
+    }
   }
 }
 
 void mouseDragged(){
   if (selectedAttribute != null){
     selectedAttribute.x = mouseX;
+  }
+  else if (selectedBox != null){
+    if (moveBox){
+      if (mouseY > 75 && mouseY + selectedBox.boxHeight < 675){
+        selectedBox.yPos = mouseY;
+      }
+    }
+    else if (resizeBox){
+      if (mouseY > (selectedBox.yPos +5) && mouseY < 675){
+        selectedBox.boxHeight = mouseY - selectedBox.yPos;
+      }
+    }
   }
 }
 
@@ -129,26 +169,30 @@ void mouseReleased(){
     selectedAttribute.x = mouseX;
     swap(selectedAttribute, selectedIndex);
     selectedAttribute = null;
+    selectedBox = null;
+    resizeBox = false;
+    moveBox = false;
   }
 }
 // right now this goes in the original order of the attribute columns
 
 void drawLines(){
   strokeWeight(0.7);
-  stroke(0,0,200);
   for (int i = 1; i < items.length; i++){
+    stroke(16, 81, 15);
     noFill();
+    Item currentItem = items[i];
+    if (!currentItem.shouldShow){ //choice here: either don't draw it or make it grayscale/transparent
+      stroke(255,0,0);
+    }
     beginShape();
     for (int j = 0; j < attributes.size(); j++){
       Attribute currentAttribute = attributes.get(j);
-      stroke(i*.25, i*.2, i*.5);
-     // stroke(150, 40, 230);
       float scaledY; 
       if (currentAttribute.isStringType){ // if it's a string, just place based on index
-        // use arrayList to store attributes
         scaledY = scalePoint(currentAttribute.max, currentAttribute.min, i);
       }
-      else{ // names have been taken care of, so draw lines to previous 
+      else{ 
         scaledY = scalePoint(currentAttribute.max, currentAttribute.min, items[i].getValue(currentAttribute.label));
       }
       vertex(currentAttribute.x, scaledY);
@@ -159,24 +203,24 @@ void drawLines(){
 
 //handle reordering of axes
 void swap(Attribute a, int indexOfA){
- boolean done = false;
- // if the attribute has been moved left
- for (int i = 0; i < indexOfA; i++){
-   if (a.x < attributes.get(i).x){
-     attributes.remove(a);
-     attributes.add(i, a);
-     done = true;
-     break;
-   }
- }
- // if it has been moved to the right
- if (!done){
-   for (int j = attributes.size()-1; j > indexOfA; j--){
-     if (a.x > attributes.get(j).x){
-       attributes.remove(indexOfA);
-       attributes.add(j, a);
+   boolean done = false;
+   // if the attribute has been moved left
+   for (int i = 0; i < indexOfA; i++){
+     if (a.x < attributes.get(i).x){
+       attributes.remove(a);
+       attributes.add(i, a);
+       done = true;
        break;
      }
    }
+   // if it has been moved to the right
+   if (!done){
+     for (int j = attributes.size()-1; j > indexOfA; j--){
+       if (a.x > attributes.get(j).x){
+         attributes.remove(indexOfA);
+         attributes.add(j, a);
+         break;
+       }
+     }
  }
 }
