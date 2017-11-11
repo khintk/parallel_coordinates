@@ -19,10 +19,13 @@ When the places of attributes are swapped, the gaps between them are not uniform
 As mentioned earlier, our original prototype includes a button to show tick marks. This was changed to keyboard input because we felt it was unnecessary to take up more space on the screen with a clickable button. The downside to this is that it is unlikely users would find such a feature without being explicitly told about it. However, that does not make it a bad visualization; that's what the user's manual is for. 
 
 **User's Manual**
-To rearrange the attributes, click in the center of its name and drag left or right.
-To filter out certain items, first click anywhere on the black line below the name of the attribute. An orange filtering box will appear. To move the location of the box on the line, click on the top orange part of the box and drag up or down. To expand or contract the height of the box, click on the bottom orange part of the box and drag down or up, respectively. 
 
-Press the 'm' key to toggle between showing additional marks or not. Currently, this input will only show the minimum and maximum values for attributes that contain numbers.
+* To rearrange the attributes, click in the center of its name and drag left or right.
+* To filter out certain items, first click anywhere on the black line below the name of the attribute. An orange filtering box will appear. 
+  * To move the location of the box on the line, click on the top orange part of the box and drag up or down. 
+  * To expand or contract the height of the box, click on the bottom orange part of the box and drag down or up, respectively. 
+
+* Press the 'm' key to toggle between showing additional marks or not. Currently, this input will only show the minimum and maximum values for attributes that contain numbers.
  
 **Future Improvements**
 
