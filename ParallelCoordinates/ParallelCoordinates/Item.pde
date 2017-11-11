@@ -1,6 +1,6 @@
+// A class representing a row in the dataset
 
 class Item{
-  
   String name;
   boolean shouldShow;
   HashMap<String, Float> dataPoints; // maps attribute to the value, so Item that is a car
