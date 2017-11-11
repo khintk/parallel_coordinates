@@ -1,3 +1,5 @@
+// A class representing a column in the dataset.
+
 class Attribute{
   float x;
   float y;
@@ -33,19 +35,20 @@ class Attribute{
     return false; 
   }
   
-  boolean shouldMoveBox(float px, float py){ // in upper bounds of box
+  boolean shouldMoveBox(float px, float py){ // move if clicked in upper bounds of box
     if( px >= box.xPos && px <= box.xPos+ box.boxWidth && (py > box.yPos -5) && py < (box.yPos+5)){
       return true; 
     }
     return false;  
   }
-  boolean shouldResizeBox(float px, float py){
+  boolean shouldResizeBox(float px, float py){ // resize if clicked in lower bounds of box
     if( px >= box.xPos && px <= box.xPos + box.boxWidth && (py > box.yPos + box.boxHeight -5) && py < (box.yPos + box.boxHeight+5)){
       return true; 
     }
     return false; 
   }
   
+  // check if a particular y value is contained in the FilterBox
   boolean withinFilter(float yVal){
     if (yVal >= box.yPos && yVal < box.yPos + box.boxHeight){
       return true;
@@ -65,6 +68,17 @@ class Attribute{
     
     if (box != null){
       box.display(x);
+    }
+  }
+  
+  // This function is incomplete. It was intended to handle drawing of tick marks and name labels
+  // in addition to the maximum and minimum values of each column.
+  // Another issue is that it shows floats to 3 decimal places, which doesn't make sense for things like years.
+  // This would be improved in the future.
+  void showMarks(){
+    if (!isStringType){
+      text(max, x-10, y - 15);
+      text(min, x-10, y + heightOfRectangle + 10);
     }
   }
   
