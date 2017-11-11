@@ -1,3 +1,5 @@
+// Class representing an interactive box that constrains the data shown.
+
 class FilterBox{
   float xPos;
   float yPos;
@@ -11,7 +13,7 @@ class FilterBox{
   void display(float aX){
     noFill();
     strokeWeight(3);
-    stroke(255,162,33);
+    stroke(255,160,33);
     xPos = aX -12;
     rect(xPos, yPos, boxWidth, boxHeight);
   }
