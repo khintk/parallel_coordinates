@@ -46,6 +46,13 @@ class Attribute{
     return false; 
   }
   
+  boolean withinFilter(float yVal){
+    if (yVal >= box.yPos && yVal < box.yPos + box.boxHeight){
+      return true;
+    }
+    return false;
+  }
+  
   
   void display(){
     stroke(0);

@@ -26,6 +26,7 @@ void setup() {
 
 void draw() {
   background(255);
+  processItems();
   drawLines();
    for(int i = 0; i<attributes.size(); i++){
      attributes.get(i).display();
@@ -42,9 +43,9 @@ void loadData() {
   for (TableRow row : dataset.rows()){
     items[count] = new Item(row.getString(0));
     count++;
-    //if (count % 4 == 0){
-    //  items[count-1].shouldShow = false;
-    //}
+    if (count % 4 == 0){
+      items[count-1].shouldShow = false;
+    }
   }
   
   float startingXValue = 50.0;
@@ -183,7 +184,7 @@ void drawLines(){
     noFill();
     Item currentItem = items[i];
     if (!currentItem.shouldShow){ //choice here: either don't draw it or make it grayscale/transparent
-      stroke(255,0,0);
+      stroke(128, 128);
     }
     beginShape();
     for (int j = 0; j < attributes.size(); j++){
@@ -222,5 +223,36 @@ void swap(Attribute a, int indexOfA){
          break;
        }
      }
+   }
+  }
+
+ void processItems(){
+   // for each item, get each value at each attribute 
+   // if at any point the value is not within the attribute's filter box, set should show to false, otherwise true
+   // there is a lot of duplicated code here from the drawLines() method
+   
+  for (int i = 1; i < items.length; i++){
+    Item currentItem = items[i];
+    int j = 0;
+    while (j < attributes.size()){
+      Attribute currentAttribute = attributes.get(j);
+      if (currentAttribute.box != null){
+        float scaledY; 
+        if (currentAttribute.isStringType){ // if it's a string, just place based on index
+          scaledY = scalePoint(currentAttribute.max, currentAttribute.min, i);
+        }
+        else{ 
+          scaledY = scalePoint(currentAttribute.max, currentAttribute.min, items[i].getValue(currentAttribute.label));
+        }
+        if (!currentAttribute.withinFilter(scaledY)){
+          currentItem.shouldShow = false;
+          break;
+        }
+        else{
+          currentItem.shouldShow = true;
+        }
+      }
+      j++;
+    }
+  }
  }
-}
