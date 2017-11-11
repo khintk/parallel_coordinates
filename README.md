@@ -13,4 +13,5 @@ For the final implementation of program, we used the same visual encoding that w
 
 
 **Future Improvements**
+
 If have more time, we would implement the feature where users can hover over the item and it shows the values of the items in that attribute. We will give users an option to make the space the attributes evenly spaced even if they swap it. We will try to make our program more time efficient and minimumize the use of for-loops. 
